@@ -22,6 +22,14 @@ public class ExplorableSection : MonoBehaviour {
         }
     }
 
+    [SerializeField]
+    private GameObject[] lootableContainers;
+    public GameObject[] LootableContainers {
+        get {
+            return lootableContainers;
+        }
+    }
+
     private GameObject externalAttachedExitLocation;
     public GameObject ExternalAttachedExitLocation {
         get {

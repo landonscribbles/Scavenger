@@ -50,14 +50,14 @@ public class MasterInventory : MonoBehaviour {
         }
     }
 
-    private int rationsOwned = 0;
-    public int RationsOwned {
+    private int provisionsOwned = 0;
+    public int ProvisionsOwned {
         get {
-            return rationsOwned;
+            return provisionsOwned;
         }
 
         set {
-            rationsOwned = value;
+            provisionsOwned = value;
         }
     }
 
