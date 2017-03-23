@@ -1,8 +1,12 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class LootableContainer : MonoBehaviour {
+
+    [SerializeField]
+    private GameObject lootUI;
 
     private int metals = 0;
     public int Metals {
@@ -64,4 +68,16 @@ public class LootableContainer : MonoBehaviour {
         displayableItems.Remove(itemToRemove);
     }
 
+    void Start() {
+        lootUI = GameObject.Find("LootUI");
+    }
+
+    void OnTriggerStay() {
+        if (Input.GetKeyDown(KeyCode.E)) {
+            //lootUI.SetActive(false);
+            //lootUI.SetActive(true);
+            lootUI.transform.Find ("LootingCanvas").gameObject.SetActive(true);
+            //lootCanvas.SetActive (true);
+        }
+    }
 }
