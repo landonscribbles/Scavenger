@@ -35,7 +35,7 @@ public class LevelGeneration : MonoBehaviour {
 
     void Awake() {
         createdRooms = new List<GameObject>();
-        createRoomBuildingPool();
+        CreateRoomBuildingPool();
         startingRoom = Instantiate(startingRoomPrefab, transform.position, Quaternion.identity);
         ExplorableSectionExit.ExitDirection startingPlayerExit = ExplorableSectionExit.ExitDirection.west;
        GameObject[] startingRoomExits = startingRoom.GetComponent<ExplorableSection>().Exits;
@@ -45,12 +45,9 @@ public class LevelGeneration : MonoBehaviour {
                 playerStartPoint = startingRoomExits[i];
             }
         }
-        buildRooms();
-        removeRoomBuildingPool();
-
     }
 
-    private void createRoomBuildingPool() {
+    private void CreateRoomBuildingPool() {
         createdRoomToRoomIdx = new Dictionary<GameObject, int>();
         instantiatedRooms = new Dictionary<ExplorableSection.RoomType, List<GameObject>>();
         for (int i = 0; i < rooms.Length; i++) {
@@ -64,14 +61,14 @@ public class LevelGeneration : MonoBehaviour {
         }
     }
 
-    private void replenishRoomPool(GameObject usedRoom, ExplorableSection.RoomType connectingType, int connectingTypeIdx) {
+    private void ReplenishRoomPool(GameObject usedRoom, ExplorableSection.RoomType connectingType, int connectingTypeIdx) {
         GameObject replacementRoom = Instantiate(rooms[createdRoomToRoomIdx[usedRoom]], transform.position, Quaternion.identity);
         createdRoomToRoomIdx[replacementRoom] = createdRoomToRoomIdx[usedRoom];
         createdRoomToRoomIdx.Remove(usedRoom);
         instantiatedRooms[connectingType][connectingTypeIdx] = replacementRoom;
     }
 
-    private void removeRoomBuildingPool() {
+    private void RemoveRoomBuildingPool() {
         ExplorableSection.RoomType[] roomTypes = (ExplorableSection.RoomType[])System.Enum.GetValues(typeof(ExplorableSection.RoomType));
 
         for (int i = 0; i < roomTypes.Length; i++) {
@@ -84,8 +81,7 @@ public class LevelGeneration : MonoBehaviour {
         }
     }
 
-
-    private void buildRooms() {
+    public List<GameObject> BuildRooms() {
         // playerStartPoint is the side of the room that the player starts in, currently it should only support
         // east or west (as that is what the hallway is by default). Later this should be changed to allow the starting
         // room type to be rotated as the game call for it
@@ -104,7 +100,7 @@ public class LevelGeneration : MonoBehaviour {
             for (int j = 0; j < pendingExits.Count; j++) {
                 ExplorableSectionExit sectionExit = pendingExits[j].GetComponent<ExplorableSectionExit>();
                 ExplorableSection.RoomType connectingType = sectionExit.ConnectableRoomTypes[Random.Range(0, sectionExit.ConnectableRoomTypes.Length)];
-                currentRoomExplorable = placeRoom(connectingType, pendingExits[j]);
+                currentRoomExplorable = PlaceRoom(connectingType, pendingExits[j]);
                 if (currentRoomExplorable != null) {
                     for (int k = 0; k < currentRoomExplorable.Exits.Length; k++) {
                         if (currentRoomExplorable.RoomAttachedExitLocation != currentRoomExplorable.Exits[k]) {
@@ -115,20 +111,22 @@ public class LevelGeneration : MonoBehaviour {
             }
             pendingExits = newExits;
         }
+        RemoveRoomBuildingPool();
+        return createdRooms;
     }
 
-    private ExplorableSection placeRoom(ExplorableSection.RoomType connectingType, GameObject exitToConnectTo) {
+    private ExplorableSection PlaceRoom(ExplorableSection.RoomType connectingType, GameObject exitToConnectTo) {
         GameObject connectableRoom = null;
         ExplorableSection connectableRoomExplorable = null;
-        List<int> roomIdxToAttempt = getRandomRoomIdx(connectingType);
+        List<int> roomIdxToAttempt = GetRandomRoomIdx(connectingType);
 
         for (int i = 0; i < roomIdxToAttempt.Count; i++) {
             connectableRoom = instantiatedRooms[connectingType][roomIdxToAttempt[i]];
             connectableRoomExplorable = connectableRoom.GetComponent<ExplorableSection>();
             connectableRoomExplorable.AttachToExit(exitToConnectTo);
-            replenishRoomPool(connectableRoom, connectingType, roomIdxToAttempt[i]);
+            ReplenishRoomPool(connectableRoom, connectingType, roomIdxToAttempt[i]);
 
-            if (doesRoomOverlap(connectableRoom)) {
+            if (DoesRoomOverlap(connectableRoom)) {
                 Destroy(connectableRoom);
                 connectableRoom = null;
                 connectableRoomExplorable = null;
@@ -141,7 +139,7 @@ public class LevelGeneration : MonoBehaviour {
         return connectableRoomExplorable;
     }
 
-    private bool doesRoomOverlap(GameObject newRoom) {
+    private bool DoesRoomOverlap(GameObject newRoom) {
         BoxCollider newRoomCollider = newRoom.GetComponent<BoxCollider>();
         for (int i = 0; i < createdRooms.Count; i++) {
             BoxCollider existingRoomCollider = createdRooms[i].GetComponent<BoxCollider>();
@@ -152,7 +150,7 @@ public class LevelGeneration : MonoBehaviour {
         return false;
     }
 
-    private List<int> getRandomRoomIdx(ExplorableSection.RoomType roomType) {
+    private List<int> GetRandomRoomIdx(ExplorableSection.RoomType roomType) {
         List<int> randomizedRoomIdx = new List<int>();
         for (int i = 0; i < instantiatedRooms[roomType].Count; i++) {
             randomizedRoomIdx.Add(i);

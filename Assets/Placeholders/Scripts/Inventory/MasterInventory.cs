@@ -4,6 +4,14 @@ using UnityEngine;
 
 public class MasterInventory : MonoBehaviour {
 
+    public enum BaseMaterials {
+        metal,
+        fabric,
+        fuel,
+        electronics,
+        provisions
+    }
+
     // Basic resource materials
 
     private int metalsOwned = 0;

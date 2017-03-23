@@ -22,6 +22,7 @@ public class ExplorableSection : MonoBehaviour {
         }
     }
 
+    // Later toggle some of these to be inactive (maybe by percent?) and return only the active ones
     [SerializeField]
     private GameObject[] lootableContainers;
     public GameObject[] LootableContainers {
